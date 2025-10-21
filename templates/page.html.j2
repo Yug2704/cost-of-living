@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Coût de la vie à {{ ville }} ({{ annee }})</title>
+  <meta name="description" content="Prix moyens à {{ ville }} : loyers, charges, internet, transport, repas, essence." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>Coût de la vie à {{ ville }}</h1>
+  <p>Mise à jour : {{ date_maj }} – Devise : {{ devise }}</p>
+
+  <h2>Loyer et dépenses</h2>
+  <table>
+    <tr><th>Catégorie</th><th>Montant (€)</th></tr>
+    <tr><td>Loyer T1 centre</td><td>{{ rent_1br_center }}</td></tr>
+    <tr><td>Loyer T1 périphérie</td><td>{{ rent_1br_outside }}</td></tr>
+    <tr><td>Charges (élec/eau)</td><td>{{ utilities_apt }}</td></tr>
+    <tr><td>Internet</td><td>{{ internet }}</td></tr>
+    <tr><td>Transport mensuel</td><td>{{ transport_monthly }}</td></tr>
+  </table>
+
+  <h2>Panier quotidien</h2>
+  <table>
+    <tr><th>Article</th><th>Prix (€)</th></tr>
+    <tr><td>Repas simple</td><td>{{ meal_inexpensive }}</td></tr>
+    <tr><td>Cappuccino</td><td>{{ cappuccino }}</td></tr>
+    <tr><td>Pain (500g)</td><td>{{ bread }}</td></tr>
+    <tr><td>Œufs (12)</td><td>{{ eggs12 }}</td></tr>
+    <tr><td>Essence (1L)</td><td>{{ gasoline }}</td></tr>
+  </table>
+
+  <p><strong>Budget estimé :</strong> {{ budget_estime }} €/mois</p>
+
+  <footer>© {{ annee }} – Données estimées</footer>
+</body>
+</html>

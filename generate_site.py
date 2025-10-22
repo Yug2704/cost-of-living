@@ -2,7 +2,7 @@ import os, datetime, pandas as pd
 from jinja2 import Environment, FileSystemLoader
 
 OUTPUT_DIR = "public"
-BASE_URL = "http://localhost:8000"
+BASE_URL = "https://yug2704.github.io/cost-of-living"
 
 env = Environment(loader=FileSystemLoader("templates"))
 
@@ -56,3 +56,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

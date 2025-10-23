@@ -2,7 +2,7 @@ import os, datetime, pandas as pd
 from jinja2 import Environment, FileSystemLoader
 
 OUTPUT_DIR = "public"
-BASE_URL = "https://yug2704.github.io/cost-of-living"  # <-- bien en prod
+BASE_URL = "https://yug2704.github.io/cost-of-living"  # domaine en ligne
 
 env = Environment(loader=FileSystemLoader("templates"))
 
@@ -16,19 +16,39 @@ def budget_estime(row):
         0
     )
 
+def ensure_dir(path):
+    os.makedirs(path, exist_ok=True)
+
+def write_file(path, content):
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+def make_sitemap(urls):
+    items = "\n".join([f"  <url><loc>{u}</loc><changefreq>weekly</changefreq></url>" for u in urls])
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>{BASE_URL}/</loc><changefreq>weekly</changefreq></url>
+{items}
+</urlset>"""
+
 def main():
+    # --- Données
     villes = pd.read_csv("data/villes.csv")
     prix = pd.read_csv("data/prix.csv")
     df = villes.merge(prix, on="slug")
     page_tpl = env.get_template("page.html.j2")
     index_tpl = env.get_template("index.html.j2")
 
-    os.makedirs(f"{OUTPUT_DIR}/villes", exist_ok=True)
+    # --- Dossiers
+    ensure_dir(f"{OUTPUT_DIR}/villes")
+
+    # --- Contexte commun
     year = datetime.date.today().year
     date_maj = datetime.date.today().strftime("%Y-%m-%d")
 
     urls = []
-    # --- Génère 1 page par ville ---
+
+    # --- Génère 1 page par ville
     for _, r in df.iterrows():
         html = page_tpl.render(
             ville=r["ville"],
@@ -48,21 +68,27 @@ def main():
             annee=year,
         )
         out_path = f"{OUTPUT_DIR}/villes/{r['slug']}.html"
-        with open(out_path, "w", encoding="utf-8") as f:
-            f.write(html)
+        write_file(out_path, html)
         urls.append(f"{BASE_URL}/villes/{r['slug']}.html")
 
-    # --- Génère la page d'accueil stylisée ---
+    # --- Génère la page d'accueil
     villes_list = df[["ville", "slug"]].to_dict("records")
     index_html = index_tpl.render(
         villes=villes_list,
         base_url=BASE_URL,
         annee=year,
     )
-    with open(f"{OUTPUT_DIR}/index.html", "w", encoding="utf-8") as f:
-        f.write(index_html)
+    write_file(f"{OUTPUT_DIR}/index.html", index_html)
 
-    print(f"Généré {len(urls)} pages + index !")
+    # --- Génère sitemap.xml
+    sitemap_xml = make_sitemap(urls)
+    write_file(f"{OUTPUT_DIR}/sitemap.xml", sitemap_xml)
+
+    # --- Génère robots.txt (pointe vers le sitemap)
+    robots_txt = f"Sitemap: {BASE_URL}/sitemap.xml\nUser-agent: *\nAllow: /\n"
+    write_file(f"{OUTPUT_DIR}/robots.txt", robots_txt)
+
+    print(f"Généré {len(urls)} pages + index + sitemap + robots.txt")
 
 if __name__ == "__main__":
     main()

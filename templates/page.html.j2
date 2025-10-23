@@ -2,42 +2,100 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Coût de la vie à {{ ville }} ({{ annee }})</title>
-  <meta name="description" content="Prix moyens à {{ ville }} : loyers, charges, internet, transport, repas, essence." />
+  <title>Coût de la vie à {{ ville }} ({{ annee }}) — loyers, charges, internet (MAJ {{ date_maj }})</title>
+
+  <meta name="description"
+        content="Prix à {{ ville }} : loyer T1 centre {{ rent_1br_center }} €, périphérie {{ rent_1br_outside }} €, charges {{ utilities_apt }} €, internet {{ internet }} €, transport {{ transport_monthly }} €. Mise à jour {{ date_maj }}." />
+
+  <link rel="canonical" href="{{ canonical }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="Cost of Living FR" />
+  <meta name="theme-color" content="#0a66ff" />
+
+  <!-- Open Graph (partage) -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Coût de la vie à {{ ville }} ({{ annee }})" />
+  <meta property="og:description" content="Loyers, charges, internet, panier quotidien — {{ ville }}, MAJ {{ date_maj }}." />
+  <meta property="og:url" content="{{ canonical }}" />
+
+  <!-- Données structurées (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebPage",
+    "name":"Coût de la vie à {{ ville }}",
+    "url":"{{ canonical }}",
+    "inLanguage":"fr",
+    "description":"Prix à {{ ville }} : loyers, charges, internet, transport. Mise à jour {{ date_maj }}.",
+    "breadcrumb":{
+      "@type":"BreadcrumbList",
+      "itemListElement":[
+        {"@type":"ListItem","position":1,"name":"Accueil","item":"{{ base_url }}/"},
+        {"@type":"ListItem","position":2,"name":"{{ ville }}","item":"{{ canonical }}"}
+      ]
+    }
+  }
+  </script>
+
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
-    table { width: 100%; border-collapse: collapse; margin: 1em 0; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-    th { background: #f0f0f0; }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;max-width:920px;margin:0 auto;padding:24px;line-height:1.55;background:#f8f9fb;color:#222}
+    header{background:#0a66ff;color:#fff;border-radius:14px;padding:22px;margin:14px 0}
+    h1{margin:0;font-size:1.8rem}
+    .meta{opacity:.95;margin-top:6px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+    table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff;border-radius:12px;overflow:hidden}
+    th,td{border-bottom:1px solid #eee;padding:10px 12px;text-align:left}
+    th{background:#f3f6ff}
+    .card{background:#fff;border:1px solid #eef2ff;border-radius:12px;padding:14px}
+    nav a{display:inline-block;margin:6px 8px 0 0;padding:8px 12px;border-radius:999px;background:#eef5ff;color:#0a66ff;text-decoration:none}
+    footer{opacity:.8;margin:18px 0}
   </style>
+
+  <!-- (Tu colleras ici le snippet Auto-ads AdSense quand tu seras accepté) -->
 </head>
 <body>
-  <h1>Coût de la vie à {{ ville }}</h1>
-  <p>Mise à jour : {{ date_maj }} – Devise : {{ devise }}</p>
 
-  <h2>Loyer et dépenses</h2>
-  <table>
-    <tr><th>Catégorie</th><th>Montant (€)</th></tr>
-    <tr><td>Loyer T1 centre</td><td>{{ rent_1br_center }}</td></tr>
-    <tr><td>Loyer T1 périphérie</td><td>{{ rent_1br_outside }}</td></tr>
-    <tr><td>Charges (élec/eau)</td><td>{{ utilities_apt }}</td></tr>
-    <tr><td>Internet</td><td>{{ internet }}</td></tr>
-    <tr><td>Transport mensuel</td><td>{{ transport_monthly }}</td></tr>
-  </table>
+  <header>
+    <h1>Coût de la vie à {{ ville }} ({{ annee }})</h1>
+    <div class="meta">MAJ : {{ date_maj }} — Devise : {{ devise }}</div>
+  </header>
 
-  <h2>Panier quotidien</h2>
-  <table>
-    <tr><th>Article</th><th>Prix (€)</th></tr>
-    <tr><td>Repas simple</td><td>{{ meal_inexpensive }}</td></tr>
-    <tr><td>Cappuccino</td><td>{{ cappuccino }}</td></tr>
-    <tr><td>Pain (500g)</td><td>{{ bread }}</td></tr>
-    <tr><td>Œufs (12)</td><td>{{ eggs12 }}</td></tr>
-    <tr><td>Essence (1L)</td><td>{{ gasoline }}</td></tr>
-  </table>
+  <main>
+    <section class="card">
+      <h2>🏠 Logement & dépenses mensuelles</h2>
+      <div class="grid">
+        <div><strong>Loyer T1 centre</strong><div>{{ rent_1br_center }} € / mois</div></div>
+        <div><strong>Loyer T1 périphérie</strong><div>{{ rent_1br_outside }} € / mois</div></div>
+        <div><strong>Charges (élec/eau)</strong><div>{{ utilities_apt }} € / mois</div></div>
+        <div><strong>Internet</strong><div>{{ internet }} € / mois</div></div>
+        <div><strong>Transport mensuel</strong><div>{{ transport_monthly }} € / mois</div></div>
+      </div>
+    </section>
 
-  <p><strong>Budget estimé :</strong> {{ budget_estime }} €/mois</p>
+    <section class="card">
+      <h2>🛒 Panier quotidien</h2>
+      <table>
+        <tr><th>Article</th><th>Prix</th></tr>
+        <tr><td>Repas bon marché (1 pers.)</td><td>{{ meal_inexpensive }} €</td></tr>
+        <tr><td>Cappuccino</td><td>{{ cappuccino }} €</td></tr>
+        <tr><td>Pain (500g)</td><td>{{ bread }} €</td></tr>
+        <tr><td>Œufs (12)</td><td>{{ eggs12 }} €</td></tr>
+        <tr><td>Essence (1 L)</td><td>{{ gasoline }} €</td></tr>
+      </table>
+    </section>
 
-  <footer>© {{ annee }} – Données estimées</footer>
+    <section class="card">
+      <h2>📌 Repère rapide</h2>
+      <p>Budget mensuel estimatif (T1 centre) ≈ <strong>{{ budget_estime }} €</strong> (loyer + charges + internet + transport + 10×repas).</p>
+    </section>
+
+    <nav>
+      <a href="{{ base_url }}/">← Accueil</a>
+      <!-- Liens internes : on peut en ajouter d'autres si besoin -->
+    </nav>
+  </main>
+
+  <footer>© {{ annee }} — Coût de la vie FR</footer>
 </body>
 </html>

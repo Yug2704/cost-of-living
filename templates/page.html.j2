@@ -1,9 +1,32 @@
 <!doctype html>
 <html lang="fr">
+
 <head>
-  <!-- Google AdSense Auto Ads -->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-V0X251QWH9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-V0X251QWH9');
+  </script>
+
+  <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3993345981950208"
-          crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
+
+  <meta charset="utf-8" />
+  <title>Coût de la vie à {{ ville }} ({{ annee }}) – loyers, charges, internet (MAJ {{ date_maj }})</title>
+
+  <meta name="description"
+    content="Prix à {{ ville }} : loyer T1 centre {{ rent_1br_center }} €, périphérie {{ rent_1br_outside }} €, internet, panier quotidien – mise à jour {{ date_maj }}." />
+
+  <link rel="canonical" href="{{ canonical }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="Cost of Living FR" />
+  <meta name="theme-color" content="#0a66ff" />
+
 
   <meta charset="utf-8" />
   <title>Coût de la vie à {{ ville }} ({{ annee }}) — loyers, charges, internet (MAJ {{ date_maj }})</title>
@@ -122,3 +145,4 @@
   </main>
 </body>
 </html>
+

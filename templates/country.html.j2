@@ -1,0 +1,13 @@
+{% set title = country.name ~ " – villes & prix" %}
+{% set description = "Coût de la vie en " ~ country.name ~ " par ville." %}
+{% extends "base.html.j2" %}
+{% block content %}
+  <h1>{{ country.name }}</h1>
+  <div class="grid g3">
+    {% for city in cities %}
+      <a class="card" href="/cities/{{ city.slug }}.html">
+        <div><strong>{{ city.name }}</strong></div>
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}

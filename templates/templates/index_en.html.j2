@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- GA + AdSense restent tels quels via page FR; ici on ne colle rien de plus -->
+  <meta charset="utf-8" />
+  <title>Cost of Living — Cities ({{ annee }})</title>
+  <meta name="description" content="Cost of living by city: rent, utilities, internet, transport. Updated {{ date_maj }}." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;max-width:920px;margin:0 auto;padding:24px;line-height:1.55}
+    a{color:#0a66ff;text-decoration:none}
+    .pill{display:inline-block;margin:6px 8px 0 0;padding:8px 12px;border-radius:999px;background:#eef5ff;border:1px solid #dbe5ff}
+    nav{margin:6px 0 18px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cost of Living — Cities</h1>
+    <nav>
+      <a href="{{ base_url }}/">🇫🇷 Français</a> · <strong>🇬🇧 English</strong>
+    </nav>
+    <p>Updated: {{ date_maj }}</p>
+  </header>
+  <main>
+    <h2>Browse cities</h2>
+    {% for it in villes %}
+      <a class="pill" href="{{ base_url }}/en/cities/{{ it.slug }}.html">{{ it.ville }}</a>
+    {% endfor %}
+  </main>
+  <footer>© {{ annee }} – Cost of Living</footer>
+</body>
+</html>

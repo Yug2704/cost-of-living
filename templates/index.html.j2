@@ -1,82 +1,26 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coût de la vie en France</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        header {
-            background: #0078d7;
-            color: white;
-            padding: 2rem 1rem;
-        }
-        main {
-            padding: 2rem;
-        }
-        h1 {
-            margin-bottom: 0.5rem;
-        }
-        p {
-            color: #555;
-            margin-bottom: 2rem;
-        }
-        .city-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-        }
-        a {
-            text-decoration: none;
-            background: white;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            color: #0078d7;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        a:hover {
-            background: #0078d7;
-            color: white;
-            transform: scale(1.05);
-        }
-        footer {
-            margin-top: 2rem;
-            padding: 1rem;
-            background: #f1f1f1;
-            color: #555;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Coût de la vie en France💸</h1>
-        <nav style="margin: 8px 0;">
-            <strong>🇫🇷 Français</strong> · 
-            <a href="{{ base_url }}/en/">🇬🇧 English</a>
-        </nav>
-        <p>Compare le coût de la vie dans les grandes villes françaises</p>
-    </header>
+{% set title = "Prix par catégories, pays et villes" %}
+{% set description = "Explorez le coût de la vie dans le monde : restaurants, loyers, transports, etc." %}
+{% extends "base.html.j2" %}
+{% block content %}
+  <h1>Prix par catégories, pays et villes</h1>
+  <p class="muted">Parcourez le coût de la vie par thème, pays puis ville.</p>
 
-    <main>
-        <div class="city-list">
-            {% for ville in villes %}
-            <a href="{{ base_url }}/villes/{{ ville.slug }}.html">{{ ville.ville }}</a>
-            {% endfor %}
-        </div>
-    </main>
+  <h2 id="categories">Catégories</h2>
+  <div class="grid g3">
+    {% for c in categories %}
+      <a class="card" href="/categories/{{ c.slug }}.html">
+        <div><strong>{{ c.name }}</strong></div>
+        {% if c.unit %}<div class="muted">{{ c.unit }}</div>{% endif %}
+      </a>
+    {% endfor %}
+  </div>
 
-    <footer>
-        © {{ annee }} — Données estimées
-    </footer>
-</body>
-</html>
+  <h2 id="pays" style="margin-top:20px">Pays</h2>
+  <div class="grid g3">
+    {% for p in countries %}
+      <a class="card" href="/countries/{{ p.slug }}.html">
+        <div><strong>{{ p.name }}</strong></div>
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}

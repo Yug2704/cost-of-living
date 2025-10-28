@@ -1,13 +1,38 @@
-{% set title = country.name ~ " – villes & prix" %}
-{% set description = "Coût de la vie en " ~ country.name ~ " par ville." %}
-{% extends "base.html.j2" %}
-{% block content %}
-  <h1>{{ country.name }}</h1>
-  <div class="grid g3">
-    {% for city in cities %}
-      <a class="card" href="/cities/{{ city.slug }}.html">
-        <div><strong>{{ city.name }}</strong></div>
-      </a>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Coût de la vie en {{ country.name }} – Prix de la vie</title>
+  <meta name="description" content="Découvrez le coût de la vie en {{ country.name }} : repas, loyers, transports, et plus. Données exprimées en euros.">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div data-include="/partials/header.html"></div>
+
+<main class="container">
+  <h1>Coût de la vie en {{ country.name }}</h1>
+
+  <section class="summary">
+    <p>En moyenne, le coût de la vie en {{ country.name }} en {{ annee }} est de 
+    <strong>{{ country.index }}</strong> comparé à la France.</p>
+  </section>
+
+  <h2>Exemples de prix</h2>
+  <div class="grid g2">
+    {% for c in categories %}
+      <div class="card">
+        <strong>{{ c.name }}</strong><br>
+        {{ c.price[country.slug] }} €{% if c.unit %}/{{ c.unit }}{% endif %}
+      </div>
     {% endfor %}
   </div>
-{% endblock %}
+
+  <p class="muted note">Données exprimées en euros pour comparaison mondiale.</p>
+</main>
+
+<div data-include="/partials/footer.html"></div>
+<script src="/assets/include.js" defer></script>
+</body>
+</html>

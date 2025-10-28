@@ -89,6 +89,10 @@
     <header class="card" style="border:none">
       <h1>Coût de la vie à {{ ville }} ({{ annee }})</h1>
       <div class="badge">MAJ : {{ date_maj }} — Devise : {{ devise }}</div>
+      <div style="margin-top:8px">
+        <strong>🇫🇷 Français</strong> ·
+        <a href="{{ base_url }}/en/cities/{{ ville|lower }}.html">🇬🇧 English</a>
+      </div>
     </header>
 
     <section class="card">
@@ -144,5 +148,6 @@
   </main>
 </body>
 </html>
+
 
 

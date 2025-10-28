@@ -1,122 +1,138 @@
-import os, datetime
-import pandas as pd
+import csv, os, shutil, datetime
 from jinja2 import Environment, FileSystemLoader
 
-OUTPUT_DIR = "public"
-BASE_URL = "https://yug2704.github.io/cost-of-living"  # à jour chez toi
+SITE_URL = "https://www.combien-coute.net"  # ← mets ton domaine
 
-env = Environment(loader=FileSystemLoader("templates"))
+ROOT = os.path.dirname(__file__)
+TPL = os.path.join(ROOT, "templates")
 
-def ensure_dir(path: str):
+DATA_DIR = os.path.join(ROOT, "data")
+CATEGORIES_CSV = os.path.join(DATA_DIR, "categories.csv")
+VILLES_CSV = os.path.join(DATA_DIR, "villes.csv")
+PRIX_CSV = os.path.join(DATA_DIR, "prix.csv")
+
+def read_csv(path):
+    with open(path, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+def ensure_dir(path):
     os.makedirs(path, exist_ok=True)
 
-def write_file(path: str, content: str):
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
+def build(out_dir):
+    env = Environment(loader=FileSystemLoader(TPL))
+    year = datetime.datetime.now().year
 
-def budget_estime(row: pd.Series) -> float:
-    def v(x): return 0 if pd.isna(x) else float(x)
-    total = v(row.get("rent_1br_center")) + v(row.get("utilities_apt")) + v(row.get("internet")) + v(row.get("transport_monthly")) + 10*v(row.get("meal_inexpensive"))
-    return round(total, 0)
+    categories = read_csv(CATEGORIES_CSV)
+    villes = read_csv(VILLES_CSV)
+    prix = read_csv(PRIX_CSV)
 
-def load_df():
-    villes = pd.read_csv("data/villes.csv")
-    prix = pd.read_csv("data/prix.csv")
-    return villes.merge(prix, on="slug", how="inner")
+    # pays
+    countries_map = {}
+    for v in villes:
+        countries_map[v["country_slug"]] = v["country_name"]
+    countries = [{"slug": s, "name": n} for s, n in sorted(countries_map.items(), key=lambda x:x[1].lower())]
 
-def make_sitemap(urls):
-    items = "\n".join([f"  <url><loc>{u}</loc><changefreq>weekly</changefreq></url>" for u in urls])
-    return f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>{BASE_URL}/</loc><changefreq>weekly</changefreq></url>
-{items}
-</urlset>"""
+    # index
+    html = env.get_template("index.html.j2").render(
+        title="",
+        description="",
+        categories=categories,
+        countries=countries,
+        year=year
+    )
+    write_page(env, out_dir, "index.html", html)
 
-def main():
-    df = load_df().copy()
-    today = datetime.date.today()
-    year = today.year
-    date_maj = today.strftime("%Y-%m-%d")
+    # dossiers
+    ensure_dir(os.path.join(out_dir, "categories"))
+    ensure_dir(os.path.join(out_dir, "countries"))
+    ensure_dir(os.path.join(out_dir, "cities"))
 
-    # TEMPLATES
-    tpl_fr = env.get_template("page.html.j2")
-    tpl_en = env.get_template("page_en.html.j2")
-    idx_fr = env.get_template("index.html.j2")       # tu l'as déjà
-    idx_en = env.get_template("index_en.html.j2")    # nouveau
+    # helpers
+    ville_by_slug = {v["city_slug"]: v for v in villes}
+    cat_by_slug = {c["slug"]: c for c in categories}
+    prices_by_city_cat = {}
+    for p in prix:
+        key = (p["city_slug"], p["category_slug"])
+        prices_by_city_cat[key] = p
 
-    # Sorties
-    ensure_dir(f"{OUTPUT_DIR}/villes")
-    ensure_dir(f"{OUTPUT_DIR}/en/cities")
-
-    urls = []
-
-    # ----- FR pages -----
-    for _, r in df.iterrows():
-        fr_url = f"{BASE_URL}/villes/{r['slug']}.html"
-        en_url = f"{BASE_URL}/en/cities/{r['slug']}.html"
-
-        html_fr = tpl_fr.render(
-            ville=r["ville"], devise=r.get("devise","EUR"),
-            rent_1br_center=r.get("rent_1br_center","-"),
-            rent_1br_outside=r.get("rent_1br_outside","-"),
-            utilities_apt=r.get("utilities_apt","-"),
-            internet=r.get("internet","-"),
-            transport_monthly=r.get("transport_monthly","-"),
-            meal_inexpensive=r.get("meal_inexpensive","-"),
-            cappuccino=r.get("cappuccino","-"),
-            bread=r.get("bread","-"),
-            eggs12=r.get("eggs12","-"),
-            gasoline=r.get("gasoline","-"),
-            budget_estime=budget_estime(r),
-            date_maj=date_maj, annee=year,
-            base_url=BASE_URL,
-            canonical=fr_url,              # ton template FR attend "canonical"
-            canonical_url=fr_url,          # et parfois "canonical_url" -> on met les deux
+    # pages catégorie
+    for c in categories:
+        rows = []
+        for v in villes:
+            p = prices_by_city_cat.get((v["city_slug"], c["slug"]))
+            rows.append({
+                "city_name": v["city_name"],
+                "value": float(p["value"]) if p else None
+            })
+        html = env.get_template("category.html.j2").render(
+            title="",
+            description="",
+            category=c,
+            rows=rows,
+            year=year
         )
-        out_fr = f"{OUTPUT_DIR}/villes/{r['slug']}.html"
-        write_file(out_fr, html_fr)
-        urls.append(fr_url)
+        write_page(env, os.path.join(out_dir, "categories"), f"{c['slug']}.html", html)
 
-        # ----- EN pages -----
-        html_en = tpl_en.render(
-            ville=r["ville"], devise=r.get("devise","EUR"),
-            rent_1br_center=r.get("rent_1br_center","-"),
-            rent_1br_outside=r.get("rent_1br_outside","-"),
-            utilities_apt=r.get("utilities_apt","-"),
-            internet=r.get("internet","-"),
-            transport_monthly=r.get("transport_monthly","-"),
-            meal_inexpensive=r.get("meal_inexpensive","-"),
-            cappuccino=r.get("cappuccino","-"),
-            bread=r.get("bread","-"),
-            eggs12=r.get("eggs12","-"),
-            gasoline=r.get("gasoline","-"),
-            budget_estime=budget_estime(r),
-            date_maj=date_maj, annee=year,
-            base_url=BASE_URL,
-            canonical_en=en_url,
-            canonical_fr=fr_url,
+    # pages pays
+    for co in countries:
+        cities = [ {"slug": v["city_slug"], "name": v["city_name"]}
+                   for v in villes if v["country_slug"] == co["slug"] ]
+        html = env.get_template("country.html.j2").render(
+            title="",
+            description="",
+            country=co,
+            cities=cities,
+            year=year
         )
-        out_en = f"{OUTPUT_DIR}/en/cities/{r['slug']}.html"
-        write_file(out_en, html_en)
-        urls.append(en_url)
+        write_page(env, os.path.join(out_dir, "countries"), f"{co['slug']}.html", html)
 
-    # ----- Index FR -----
-    villes_list = df[["ville","slug"]].sort_values("ville").to_dict("records")
-    html_idx_fr = idx_fr.render(villes=villes_list, base_url=BASE_URL, annee=year, date_maj=date_maj)
-    write_file(f"{OUTPUT_DIR}/index.html", html_idx_fr)
+    # pages villes
+    for v in villes:
+        rows = []
+        for c in categories:
+            p = prices_by_city_cat.get((v["city_slug"], c["slug"]))
+            rows.append({
+                "slug": c["slug"],
+                "name": c["name"],
+                "unit": c.get("unit") or "",
+                "value": float(p["value"]) if p else None
+            })
+        html = env.get_template("city.html.j2").render(
+            title="",
+            description="",
+            city={"slug": v["city_slug"], "name": v["city_name"]},
+            rows=rows,
+            year=year
+        )
+        write_page(env, os.path.join(out_dir, "cities"), f"{v['city_slug']}.html", html)
 
-    # ----- Index EN -----
-    html_idx_en = idx_en.render(villes=villes_list, base_url=BASE_URL, annee=year, date_maj=date_maj)
-    write_file(f"{OUTPUT_DIR}/en/index.html", html_idx_en)
+    # sitemap.xml
+    sm = env.get_template("sitemap.xml.j2").render(
+        site_url=SITE_URL,
+        categories=categories,
+        countries=countries,
+        cities=[{"slug": v["city_slug"]} for v in villes]
+    )
+    with open(os.path.join(out_dir, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write(sm)
 
-    # ----- sitemap & robots -----
-    sitemap = make_sitemap(urls)
-    write_file(f"{OUTPUT_DIR}/sitemap.xml", sitemap)
+    # robots.txt
+    robots = env.get_template("robots.txt.j2").render(site_url=SITE_URL)
+    with open(os.path.join(out_dir, "robots.txt"), "w", encoding="utf-8") as f:
+        f.write(robots)
 
-    robots = f"Sitemap: {BASE_URL}/sitemap.xml\nUser-agent: *\nAllow: /\n"
-    write_file(f"{OUTPUT_DIR}/robots.txt", robots)
+    # ads.txt : on copie celui à la racine du repo si présent
+    src_ads = os.path.join(ROOT, "ads.txt")
+    if os.path.exists(src_ads):
+        shutil.copyfile(src_ads, os.path.join(out_dir, "ads.txt"))
 
-    print(f"Generated FR+EN: {len(urls)} URLs, index & sitemap OK")
+def write_page(env, out_dir, filename, html):
+    with open(os.path.join(out_dir, filename), "w", encoding="utf-8") as f:
+        f.write(html)
 
 if __name__ == "__main__":
-    main()
+    # sortie : le repo GitHub Pages à côté (adapte si besoin)
+    OUT = os.path.abspath(os.path.join(ROOT, "..", "yug2704.github.io"))
+    ensure_dir(OUT)
+    build(OUT)
+    print("Site généré →", OUT)

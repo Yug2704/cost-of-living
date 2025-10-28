@@ -1,0 +1,16 @@
+{% set title = category.name ~ " – par villes" %}
+{% set description = "Prix de " ~ category.name ~ " par ville." %}
+{% extends "base.html.j2" %}
+{% block content %}
+  <h1>{{ category.name }}</h1>
+  <div class="grid g2">
+    {% for row in rows %}
+      <div class="card">
+        <div>{{ row.city_name }}</div>
+        <div><strong>
+          {% if row.value is not none %}{{ row.value }}{% else %}—{% endif %}
+        </strong>{% if category.unit %} {{ category.unit }}{% endif %}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

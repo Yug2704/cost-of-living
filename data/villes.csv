@@ -1,16 +1,5 @@
-ville,slug,pays,devise
-Paris,paris,France,EUR
-Lyon,lyon,France,EUR
-Marseille,marseille,France,EUR
-Bordeaux,bordeaux,France,EUR
-Lille,lille,France,EUR
-Nice,nice,France,EUR
-Nantes,nantes,France,EUR
-Montpellier,montpellier,France,EUR
-Toulouse,toulouse,France,EUR
-Strasbourg,strasbourg,France,EUR
-Rennes,rennes,France,EUR
-Reims,reims,France,EUR
-Saint-Étienne,saint-etienne,France,EUR
-Le Havre,le-havre,France,EUR
-Grenoble,grenoble,France,EUR
+city_slug,city_name,country_slug,country_name
+paris,Paris,france,France
+lyon,Lyon,france,France
+madrid,Madrid,espagne,Espagne
+tokyo,Tokyo,japon,Japon

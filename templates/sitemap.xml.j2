@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>{{ site_url }}/index.html</loc></url>
-  {% for c in categories %}<url><loc>{{ site_url }}/categories/{{ c.slug }}.html</loc></url>{% endfor %}
-  {% for p in countries %}<url><loc>{{ site_url }}/countries/{{ p.slug }}.html</loc></url>{% endfor %}
-  {% for ci in cities %}<url><loc>{{ site_url }}/cities/{{ ci.slug }}.html</loc></url>{% endfor %}
-</urlset>
